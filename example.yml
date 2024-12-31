@@ -1,0 +1,30 @@
+name: Deploy Ubuntu VM on Azure
+
+on:
+  push:
+    branches:
+      - prod
+
+permissions:
+  id-token: write 
+  contents: read    
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Create a VM
+        uses: azure/CLI@v1
+        with:
+          azcliversion: 2.30.0
+          inlineScript: |
+            az vm create --name smallest-ubuntu-vm --resource-group AZ-something --image UbuntuLTS --size Standard_B1s --generate-ssh-keys
